@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { FeaturedEvents } from '@/components/events/FeaturedEvents';
 import { EventCard } from '@/components/events/EventCard';
-import { getUpcomingEvents } from '@/lib/data/events';
+import { WeekStrip } from '@/components/calendar/WeekStrip';
+import { getUpcomingEvents, getEventsGroupedByDateRange, getTwoWeeksDays } from '@/lib/data/events';
 import type { TechCategory } from '@/types/event';
 
 const TECH_CATEGORY_CARDS: { category: TechCategory; icon: string }[] = [
@@ -16,6 +17,10 @@ const TECH_CATEGORY_CARDS: { category: TechCategory; icon: string }[] = [
 
 export default async function Home() {
   const upcomingEvents = await getUpcomingEvents(8);
+  const twoWeeksDays = getTwoWeeksDays();
+  const twoWeeksStart = twoWeeksDays[0];
+  const twoWeeksEnd = twoWeeksDays[twoWeeksDays.length - 1];
+  const weekEventsByDate = await getEventsGroupedByDateRange(twoWeeksStart, twoWeeksEnd);
 
   return (
     <div>
@@ -34,6 +39,14 @@ export default async function Home() {
           >
             イベントを探す →
           </Link>
+        </div>
+      </section>
+
+      {/* Week Calendar Strip */}
+      <section className="py-10 bg-zinc-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl font-bold mb-4">今後2週間のイベント</h2>
+          <WeekStrip days={twoWeeksDays} eventsByDate={weekEventsByDate} />
         </div>
       </section>
 

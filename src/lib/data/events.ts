@@ -1,4 +1,4 @@
-import { parseISO, compareAsc, format } from 'date-fns';
+import { parseISO, compareAsc, format, eachDayOfInterval } from 'date-fns';
 import { mockEvents } from '@/lib/data/mock-events';
 import { applyFilters } from '@/lib/utils/filters';
 import type { Event, EventFilters } from '@/types/event';
@@ -86,4 +86,41 @@ export async function getEventsGroupedByDate(
   }
 
   return grouped;
+}
+
+/**
+ * 指定期間のイベントを日付別にグルーピング
+ */
+export async function getEventsGroupedByDateRange(
+  start: Date,
+  end: Date
+): Promise<Record<string, Event[]>> {
+  const grouped: Record<string, Event[]> = {};
+
+  const events = mockEvents
+    .filter((event) => {
+      const eventDate = parseISO(event.start_date);
+      return eventDate >= start && eventDate <= end;
+    })
+    .sort((a, b) => compareAsc(parseISO(a.start_date), parseISO(b.start_date)));
+
+  for (const event of events) {
+    const dateKey = format(parseISO(event.start_date), 'yyyy-MM-dd');
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = [];
+    }
+    grouped[dateKey].push(event);
+  }
+
+  return grouped;
+}
+
+/**
+ * 今週+翌週の日付配列を取得（14日分）
+ */
+export function getTwoWeeksDays(): Date[] {
+  const today = new Date();
+  const end = new Date(today);
+  end.setDate(end.getDate() + 13);
+  return eachDayOfInterval({ start: today, end });
 }
