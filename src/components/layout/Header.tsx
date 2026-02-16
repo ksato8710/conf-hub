@@ -7,12 +7,18 @@ export function Header() {
         <Link href="/" className="text-xl font-bold text-blue-600">
           ConfHub
         </Link>
-        <nav>
+        <nav className="flex items-center gap-6">
           <Link
             href="/events"
             className="text-sm font-medium text-zinc-700 hover:text-zinc-900 transition-colors"
           >
             イベント一覧
+          </Link>
+          <Link
+            href="/calendar"
+            className="text-sm font-medium text-zinc-700 hover:text-zinc-900 transition-colors"
+          >
+            カレンダー
           </Link>
         </nav>
       </div>

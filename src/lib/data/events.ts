@@ -1,4 +1,4 @@
-import { parseISO, compareAsc } from 'date-fns';
+import { parseISO, compareAsc, format } from 'date-fns';
 import { mockEvents } from '@/lib/data/mock-events';
 import { applyFilters } from '@/lib/utils/filters';
 import type { Event, EventFilters } from '@/types/event';
@@ -41,4 +41,49 @@ export async function getUpcomingEvents(limit: number = 8): Promise<Event[]> {
     .filter((e) => parseISO(e.start_date) >= now)
     .sort((a, b) => compareAsc(parseISO(a.start_date), parseISO(b.start_date)))
     .slice(0, limit);
+}
+
+/**
+ * 指定月のイベントを取得（start_dateがその月に含まれるもの）
+ * @param year 年
+ * @param month 月（1-12）
+ * @returns その月のイベント一覧
+ */
+export async function getEventsByMonth(year: number, month: number): Promise<Event[]> {
+  // 月の開始日と終了日を計算
+  const monthStart = new Date(year, month - 1, 1);
+  const monthEnd = new Date(year, month, 0, 23, 59, 59, 999);
+
+  return mockEvents
+    .filter((event) => {
+      const eventDate = parseISO(event.start_date);
+      return eventDate >= monthStart && eventDate <= monthEnd;
+    })
+    .sort((a, b) => compareAsc(parseISO(a.start_date), parseISO(b.start_date)));
+}
+
+/**
+ * 日付別にグルーピング（キーは "YYYY-MM-DD" 形式の文字列）
+ * @param year 年
+ * @param month 月（1-12）
+ * @returns 日付をキーとしたイベントのマップ
+ */
+export async function getEventsGroupedByDate(
+  year: number,
+  month: number
+): Promise<Record<string, Event[]>> {
+  const events = await getEventsByMonth(year, month);
+  const grouped: Record<string, Event[]> = {};
+
+  for (const event of events) {
+    const eventDate = parseISO(event.start_date);
+    const dateKey = format(eventDate, 'yyyy-MM-dd');
+
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = [];
+    }
+    grouped[dateKey].push(event);
+  }
+
+  return grouped;
 }
