@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ConfHub
 
-## Getting Started
+日本の技術カンファレンス情報を集約する Next.js アプリです。  
+イベント情報はローカル SQLite（`data/confhub.sqlite`）を唯一の参照元として管理します。
 
-First, run the development server:
+## セットアップ
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+初回のみ、SQLite 初期化（モックデータ投入）を実行してください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm events:init
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## イベントデータ運用
 
-## Learn More
+```bash
+pnpm events:init            # スキーマ作成 + モックデータ upsert
+pnpm events:sync            # connpass 収集 + SQLite upsert
+pnpm events:sync --seed-mock
+pnpm events:sync --skip-connpass
+pnpm events:collect:json    # connpass 収集結果をJSONで標準出力
+```
 
-To learn more about Next.js, take a look at the following resources:
+`events:sync` の対象月はデフォルトで「当月から6ヶ月」です。  
+明示する場合は `--months=YYYYMM,YYYYMM` を指定します。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## DBファイルの場所
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- デフォルト: `data/confhub.sqlite`
+- 環境変数で変更: `CONFHUB_DB_PATH`
+  - 例: `CONFHUB_DB_PATH=/tmp/confhub.sqlite pnpm events:init`
 
-## Deploy on Vercel
+## 参照仕様
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+詳細は `docs/event-data-sqlite.md` を参照してください。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 開発コマンド
+
+```bash
+pnpm dev
+pnpm lint
+pnpm build
+```

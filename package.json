@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "events:init": "tsx src/scripts/init-events-db.ts",
+    "events:sync": "tsx src/scripts/sync-events-sqlite.ts",
+    "events:collect:json": "tsx src/scripts/collect-connpass.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",
@@ -18,12 +21,13 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^25.2.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

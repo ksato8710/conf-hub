@@ -1,12 +1,21 @@
+import 'server-only';
+
 import { parseISO, compareAsc, format, eachDayOfInterval } from 'date-fns';
-import { mockEvents } from '@/lib/data/mock-events';
+import {
+  ensureEventStore,
+  findEventBySlugFromStore,
+  listEventsFromStore,
+} from '@/lib/db/events-repository';
 import { applyFilters } from '@/lib/utils/filters';
 import type { Event, EventFilters } from '@/types/event';
 
+function sortByStartDateAsc(events: Event[]): Event[] {
+  return [...events].sort((a, b) => compareAsc(parseISO(a.start_date), parseISO(b.start_date)));
+}
+
 export async function getEvents(filters?: Partial<EventFilters>): Promise<Event[]> {
-  const sorted = [...mockEvents].sort((a, b) =>
-    compareAsc(parseISO(a.start_date), parseISO(b.start_date))
-  );
+  ensureEventStore({ seedFromMock: true });
+  const sorted = sortByStartDateAsc(listEventsFromStore());
 
   if (!filters) return sorted;
 
@@ -26,18 +35,20 @@ export async function getEvents(filters?: Partial<EventFilters>): Promise<Event[
 }
 
 export async function getEventBySlug(slug: string): Promise<Event | null> {
-  return mockEvents.find((e) => e.slug === slug) ?? null;
+  ensureEventStore({ seedFromMock: true });
+  return findEventBySlugFromStore(slug);
 }
 
 export async function getFeaturedEvents(): Promise<Event[]> {
-  return mockEvents
-    .filter((e) => e.is_featured)
-    .sort((a, b) => compareAsc(parseISO(a.start_date), parseISO(b.start_date)));
+  ensureEventStore({ seedFromMock: true });
+  return sortByStartDateAsc(listEventsFromStore().filter((event) => event.is_featured));
 }
 
 export async function getUpcomingEvents(limit: number = 8): Promise<Event[]> {
+  ensureEventStore({ seedFromMock: true });
+  const allEvents = listEventsFromStore();
   const now = new Date();
-  return mockEvents
+  return allEvents
     .filter((e) => parseISO(e.start_date) >= now)
     .sort((a, b) => compareAsc(parseISO(a.start_date), parseISO(b.start_date)))
     .slice(0, limit);
@@ -50,11 +61,14 @@ export async function getUpcomingEvents(limit: number = 8): Promise<Event[]> {
  * @returns その月のイベント一覧
  */
 export async function getEventsByMonth(year: number, month: number): Promise<Event[]> {
+  ensureEventStore({ seedFromMock: true });
+  const allEvents = listEventsFromStore();
+
   // 月の開始日と終了日を計算
   const monthStart = new Date(year, month - 1, 1);
   const monthEnd = new Date(year, month, 0, 23, 59, 59, 999);
 
-  return mockEvents
+  return allEvents
     .filter((event) => {
       const eventDate = parseISO(event.start_date);
       return eventDate >= monthStart && eventDate <= monthEnd;
@@ -95,9 +109,11 @@ export async function getEventsGroupedByDateRange(
   start: Date,
   end: Date
 ): Promise<Record<string, Event[]>> {
+  ensureEventStore({ seedFromMock: true });
+  const allEvents = listEventsFromStore();
   const grouped: Record<string, Event[]> = {};
 
-  const events = mockEvents
+  const events = allEvents
     .filter((event) => {
       const eventDate = parseISO(event.start_date);
       return eventDate >= start && eventDate <= end;
