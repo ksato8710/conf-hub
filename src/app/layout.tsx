@@ -21,6 +21,24 @@ export const metadata: Metadata = {
   },
   description:
     '日本の技術カンファレンスを職種・技術・形式・規模で検索。Googleカレンダー連携対応。',
+  openGraph: {
+    title: 'Conf Hub',
+    description: '技術カンファレンス一覧',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Conf Hub',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Conf Hub',
+    description: '技術カンファレンス一覧',
+  },
 };
 
 export default function RootLayout({
