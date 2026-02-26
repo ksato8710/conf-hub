@@ -12,6 +12,7 @@
     "events:collect:json": "tsx src/scripts/collect-connpass.ts"
   },
   "dependencies": {
+    "@next/third-parties": "^16.1.6",
     "@supabase/supabase-js": "^2.95.3",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.564.0",
