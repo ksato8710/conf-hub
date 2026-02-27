@@ -9,7 +9,8 @@
     "lint": "eslint",
     "events:init": "tsx src/scripts/init-events-db.ts",
     "events:sync": "tsx src/scripts/sync-events-sqlite.ts",
-    "events:collect:json": "tsx src/scripts/collect-connpass.ts"
+    "events:collect:json": "tsx src/scripts/collect-connpass.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@next/third-parties": "^16.1.6",
@@ -27,6 +28,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "husky": "^9.1.7",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
